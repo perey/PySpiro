@@ -3,6 +3,8 @@
 """libspiro C interface."""
 
 # Copyright © 2015 Timothy Pederick.
+# Based on libspiro:
+#     Copyright © 2007 Raph Levien
 #
 # This file is part of PySpiro.
 #

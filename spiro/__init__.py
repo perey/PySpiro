@@ -3,6 +3,8 @@
 """PySpiro: A Python 3 wrapper for libspiro."""
 
 # Copyright © 2015 Timothy Pederick.
+# Based on libspiro:
+#     Copyright © 2007 Raph Levien
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,4 +19,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['native']
+__all__ = ['native', 'context']
