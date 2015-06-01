@@ -23,8 +23,12 @@
 
 __all__ = ['BezierContext', 'SVGPathContext']
 
+# Standard library imports.
+from ctypes import pointer, c_void_p
+
 # Local imports.
-from .native import bezctx
+from .native import (bezctx, moveto_fn, lineto_fn, quadto_fn, curveto_fn,
+                     mark_knot_fn)
 
 class BezierContext:
     """A context in which Bézier curves are generated.
@@ -35,24 +39,27 @@ class BezierContext:
     abstract class.
 
     Subclasses must implement these four functions:
-        * moveto(self, x, y, is_open): Generate a "move to" instruction,
-            beginning a new subpath at (x, y). The argument is_open
-            determines whether this subpath is open or closed. (Note
-            that the native library supplies an integer, not a Boolean.)
-        * lineto(self, x, y): Generate a "line to" instruction, drawing
-            a straight line to (x, y).
-        * quadto(self, x1, y1, x2, y2): Generate a "quad to" (quadratic
-            Bézier) instruction, drawing a quadratic Bézier curve to
-            (x2, y2) with control point (x1, y1).
-        * curveto(self, x1, y1, x2, y2, x3, y3): Generate a "curve to"
-            (cubic Bézier) instruction, drawing a cubic Bézier curve to
-            (x3, y3) with control points (x1, y1) and (x2, y2).
+        * moveto(self, ctx, x, y, is_open): Generate a "move to"
+            instruction, beginning a new subpath at (x, y). The argument
+            is_open determines whether this subpath is open or closed.
+            (Note that the native library supplies an integer, not a
+            Boolean.)
+        * lineto(self, ctx, x, y): Generate a "line to" instruction,
+            drawing a straight line to (x, y).
+        * quadto(self, ctx, x1, y1, x2, y2): Generate a "quad to"
+            (quadratic Bézier) instruction, drawing a quadratic Bézier
+            curve to (x2, y2) with control point (x1, y1).
+        * curveto(self, ctx, x1, y1, x2, y2, x3, y3): Generate a "curve
+            to" (cubic Bézier) instruction, drawing a cubic Bézier curve
+            to (x3, y3) with control points (x1, y1) and (x2, y2).
 
     Optionally, a fifth function may be provided:
-        * mark_knot(self, knot_idx): Mark a knot on the spline with the
-            given knot index.
+        * mark_knot(self, ctx, knot_idx): Mark a knot on the spline with
+            the given knot index.
 
-    Nothing should be returned by these functions.
+    The ctx argument to all of these functions is a copy of the instance
+    as seen by the native interface; it can be ignored. Nothing should
+    be returned by these functions.
 
     Other operations and information needed by the context will be
     unseen by the native library, and only accessed through these five
@@ -60,22 +67,27 @@ class BezierContext:
 
     """
     @property
-    def _as_parameter_(self):
-        return bezctx(self.moveto, self.lineto, self.quadto, self.curveto,
-                      None if not hasattr(self, 'mark_knot') else
-                      self.mark_knot)
+    def _native_handle_(self):
+        return pointer(bezctx(moveto_fn(self.moveto),
+                              lineto_fn(self.lineto),
+                              quadto_fn(self.quadto),
+                              curveto_fn(self.curveto),
+                              mark_knot_fn(self.mark_knot)))
 
-    def moveto(self, x, y, is_open):
+    def moveto(self, ctx, x, y, is_open):
         raise NotImplementedError
 
-    def lineto(self, x, y):
+    def lineto(self, ctx, x, y):
         raise NotImplementedError
 
-    def quadto(self, x1, y1, x2, y2):
+    def quadto(self, ctx, x1, y1, x2, y2):
         raise NotImplementedError
 
-    def curveto(self, x1, y1, x2, y2, x3, y3):
+    def curveto(self, ctx, x1, y1, x2, y2, x3, y3):
         raise NotImplementedError
+
+    def mark_knot(self, ctx, knot_idx):
+        return
 
 
 class SVGPathContext(BezierContext):
@@ -106,7 +118,7 @@ class SVGPathContext(BezierContext):
         if exc_type is None and not self.is_open:
             print('Z', end='', file=self.file)
 
-    def moveto(self, x, y, is_open):
+    def moveto(self, ctx, x, y, is_open):
         if self._first_subpath:
             self._first_subpath = False
         elif not self.is_open:
@@ -114,12 +126,12 @@ class SVGPathContext(BezierContext):
         print('M{},{}'.format(x, y), end=' ', file=self.file)
         self.is_open = is_open
 
-    def lineto(self, x, y):
+    def lineto(self, ctx, x, y):
         print('L{},{}'.format(x, y), end=' ', file=self.file)
 
-    def quadto(self, x1, y1, x2, y2):
+    def quadto(self, ctx, x1, y1, x2, y2):
         print('Q{},{} {},{}'.format(x1, y1, x2, y2), end=' ', file=self.file)
 
-    def curveto(self, x1, y1, x2, y2, x3, y3):
+    def curveto(self, ctx, x1, y1, x2, y2, x3, y3):
         print('C{},{} {},{} {},{}'.format(x1, y1, x2, y2, x3, y3), end=' ',
               file=self.file)

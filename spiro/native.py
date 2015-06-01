@@ -21,7 +21,10 @@
 # You should have received a copy of the GNU General Public License
 # along with PySpiro. If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = []
+__all__ = ['spiro_cp', 'SpiroCPType', 'bezctx', 'moveto_fn', 'lineto_fn',
+           'quadto_fn', 'curveto_fn', 'mark_knot_fn',
+           'run_spiro', 'free_spiro', 'spiro_to_bpath', 'get_knot_th',
+           'TaggedSpiroCPsToBezier', 'SpiroCPsToBezier']
 
 # Standard library imports
 import ctypes
@@ -80,16 +83,18 @@ SpiroCPType = Enum('SpiroCPType', (('corner', b'v'),
 
 class bezctx(Structure):
     pass
-bezctx._fields_ = [('moveto', CFUNCTYPE(None, POINTER(bezctx), c_double,
-                                        c_double, c_int)),
-                   ('lineto', CFUNCTYPE(None, POINTER(bezctx), c_double,
-                                        c_double)),
-                   ('quadto', CFUNCTYPE(None, POINTER(bezctx), c_double,
-                                        c_double, c_double, c_double)),
-                   ('curveto', CFUNCTYPE(None, POINTER(bezctx), c_double,
-                                         c_double, c_double, c_double,
-                                         c_double, c_double)),
-                   ('mark_knot', CFUNCTYPE(None, POINTER(bezctx), c_int))]
+moveto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double, c_int)
+lineto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double)
+quadto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double, c_double,
+                      c_double)
+curveto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double, c_double,
+                       c_double, c_double, c_double)
+mark_knot_fn = CFUNCTYPE(None, POINTER(bezctx), c_int)
+bezctx._fields_ = [('moveto', moveto_fn),
+                   ('lineto', lineto_fn),
+                   ('quadto', quadto_fn),
+                   ('curveto', curveto_fn),
+                   ('mark_knot', mark_knot_fn)]
 
 
 # Argument and return types for functions.
@@ -97,24 +102,30 @@ bezctx._fields_ = [('moveto', CFUNCTYPE(None, POINTER(bezctx), c_double,
 # spiro_seg * run_spiro(const spiro_cp *src, int n);
 spiro.run_spiro.argtypes = (POINTER(spiro_cp), c_int)
 spiro.run_spiro.restype = POINTER(spiro_cp)
+run_spiro = spiro.run_spiro
 
 # void free_spiro(spiro_seg *s);
 spiro.free_spiro.argtypes = (POINTER(spiro_seg),)
 spiro.free_spiro.restype = None
+free_spiro = spiro.free_spiro
 
 # void spiro_to_bpath(const spiro_seg *s, int n, bezctx *bc);
 spiro.spiro_to_bpath.argtypes = (POINTER(spiro_seg), c_int, POINTER(bezctx))
 spiro.spiro_to_bpath.restype = None
+spiro_to_bpath = spiro.spiro_to_bpath
 
 # double get_knot_th(const spiro_seg *s, int i);
 spiro.get_knot_th.argtypes = (POINTER(spiro_seg), c_int)
 spiro.get_knot_th.restype = c_double
+get_knot_th = spiro.get_knot_th
 
 # void TaggedSpiroCPsToBezier(spiro_cp *spiros, bezctx *bc);
 spiro.TaggedSpiroCPsToBezier.argtypes = (POINTER(spiro_cp), POINTER(bezctx))
 spiro.TaggedSpiroCPsToBezier.restype = None
+TaggedSpiroCPsToBezier = spiro.TaggedSpiroCPsToBezier
 
 # void SpiroCPsToBezier(spiro_cp *spiros, int n, int isclosed, bezctx *bc);
 spiro.SpiroCPsToBezier.argtypes = (POINTER(spiro_cp), c_int, c_int,
                                    POINTER(bezctx))
 spiro.SpiroCPsToBezier.restype = None
+SpiroCPsToBezier = spiro.SpiroCPsToBezier

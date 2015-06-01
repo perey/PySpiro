@@ -19,4 +19,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['native', 'context']
+__all__ = ['CPType', 'BezierContext', 'SVGPathContext',
+           'to_bezier', 'tagged_to_bezier']
+
+# Standard library imports.
+from ctypes import POINTER
+
+# Local imports.
+from . import native
+from .native import SpiroCPType as CPType, spiro_cp
+from .context import BezierContext, SVGPathContext
+
+# Public functions.
+def to_bezier(points, closed, context):
+    """Convert a sequence of Spiro points to Bézier curves."""
+    native.SpiroCPsToBezier(_to_cp_array(points), len(points),
+                            1 if closed else 0, context._native_handle_)
+
+def tagged_to_bezier(points, context):
+    """Convert a "tagged" sequence of Spiro points to Bézier curves."""
+    native.TaggedSpiroCPsToBezier(_to_cp_array(points),
+                                  context._native_handle_)
+
+# Private function.
+def _to_cp_array(points):
+    seq = list(spiro_cp(*point) for point in points)
+    return (spiro_cp * len(points))(*seq)
