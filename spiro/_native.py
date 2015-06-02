@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PySpiro. If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['spiro_cp', 'SpiroCPType', 'bezctx', 'moveto_fn', 'lineto_fn',
+__all__ = ['spiro_cp', 'CPType', 'bezctx', 'moveto_fn', 'lineto_fn',
            'quadto_fn', 'curveto_fn', 'mark_knot_fn',
            'run_spiro', 'free_spiro', 'spiro_to_bpath', 'get_knot_th',
            'TaggedSpiroCPsToBezier', 'SpiroCPsToBezier']
@@ -71,14 +71,14 @@ class spiro_seg(Structure):
                 ('l', c_double)]
 
 
-SpiroCPType = Enum('SpiroCPType', (('corner', b'v'),
-                                   ('g4', b'o'),
-                                   ('g2', b'c'),
-                                   ('left', b'['),
-                                   ('right', b']'),
-                                   ('end', b'z'),
-                                   ('open_contour', b'{'),
-                                   ('end_open_contour', b'}')))
+CPType = Enum('SpiroCPType', (('corner',           b'v'),
+                              ('g4',               b'o'),
+                              ('g2',               b'c'),
+                              ('left',             b'['),
+                              ('right',            b']'),
+                              ('end',              b'z'),
+                              ('open_contour',     b'{'),
+                              ('end_open_contour', b'}')))
 
 
 class bezctx(Structure):

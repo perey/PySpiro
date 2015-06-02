@@ -26,8 +26,8 @@ __all__ = ['CPType', 'BezierContext', 'SVGPathContext',
 from ctypes import POINTER
 
 # Local imports.
-from ._native import (SpiroCPsToBezier, TaggedSpiroCPsToBezier,
-                      SpiroCPType as CPType, spiro_cp)
+from ._native import (SpiroCPsToBezier, TaggedSpiroCPsToBezier, CPType,
+                      spiro_cp)
 from ._context import BezierContext, SVGPathContext
 
 # Public functions.
