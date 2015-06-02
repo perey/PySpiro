@@ -26,20 +26,19 @@ __all__ = ['CPType', 'BezierContext', 'SVGPathContext',
 from ctypes import POINTER
 
 # Local imports.
-from . import native
-from .native import SpiroCPType as CPType, spiro_cp
-from .context import BezierContext, SVGPathContext
+from ._native import (SpiroCPsToBezier, TaggedSpiroCPsToBezier,
+                      SpiroCPType as CPType, spiro_cp)
+from ._context import BezierContext, SVGPathContext
 
 # Public functions.
 def to_bezier(points, closed, context):
     """Convert a sequence of Spiro points to Bézier curves."""
-    native.SpiroCPsToBezier(_to_cp_array(points), len(points),
-                            1 if closed else 0, context._native_handle_)
+    SpiroCPsToBezier(_to_cp_array(points), len(points),
+                     1 if closed else 0, context._native_handle_)
 
 def tagged_to_bezier(points, context):
     """Convert a "tagged" sequence of Spiro points to Bézier curves."""
-    native.TaggedSpiroCPsToBezier(_to_cp_array(points),
-                                  context._native_handle_)
+    TaggedSpiroCPsToBezier(_to_cp_array(points), context._native_handle_)
 
 # Private function.
 def _to_cp_array(points):

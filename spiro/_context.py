@@ -27,8 +27,8 @@ __all__ = ['BezierContext', 'SVGPathContext']
 from ctypes import pointer, c_void_p
 
 # Local imports.
-from .native import (bezctx, moveto_fn, lineto_fn, quadto_fn, curveto_fn,
-                     mark_knot_fn)
+from ._native import (bezctx, moveto_fn, lineto_fn, quadto_fn, curveto_fn,
+                      mark_knot_fn)
 
 class BezierContext:
     """A context in which Bézier curves are generated.
