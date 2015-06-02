@@ -74,6 +74,9 @@ class BezierContext:
                               curveto_fn(self.curveto),
                               mark_knot_fn(self.mark_knot)))
 
+    def __init__(self, *args, **kwargs):
+        raise NotImplementedError
+
     def moveto(self, ctx, x, y, is_open):
         raise NotImplementedError
 
@@ -102,7 +105,7 @@ class SVGPathContext(BezierContext):
     def __init__(self, file):
         self.file = file
         self._first_subpath = True
-        self.is_open = False
+        self.is_open = True
 
     def __enter__(self):
         """Enter the context manager."""
