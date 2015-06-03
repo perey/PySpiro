@@ -121,20 +121,33 @@ class SVGPathContext(BezierContext):
         if exc_type is None and not self.is_open:
             print('Z', end='', file=self.file)
 
+    @staticmethod
+    def _numstr(n, precision=6):
+        """Number-to-string conversion with sensible precision."""
+        fmt = '{:.' + str(int(precision)) + '}'
+        return str(int(n)) if int(n) == n else fmt.format(n)
+
     def moveto(self, ctx, x, y, is_open):
         if self._first_subpath:
             self._first_subpath = False
         elif not self.is_open:
             print('Z', end=' ', file=self.file)
-        print('M{},{}'.format(x, y), end=' ', file=self.file)
+        print('M{},{}'.format(*(self._numstr(n) for n in (x, y))),
+              end=' ', file=self.file)
         self.is_open = is_open
 
     def lineto(self, ctx, x, y):
-        print('L{},{}'.format(x, y), end=' ', file=self.file)
+        print('L{},{}'.format(*(self._numstr(n) for n in (x, y))),
+              end=' ', file=self.file)
 
     def quadto(self, ctx, x1, y1, x2, y2):
-        print('Q{},{} {},{}'.format(x1, y1, x2, y2), end=' ', file=self.file)
+        print('Q{},{} {},{}'.format(*(self._numstr(n) for n in (x1, y1,
+                                                                x2, y2))),
+              end=' ', file=self.file)
 
     def curveto(self, ctx, x1, y1, x2, y2, x3, y3):
-        print('C{},{} {},{} {},{}'.format(x1, y1, x2, y2, x3, y3), end=' ',
-              file=self.file)
+        print('C{},{} {},{} {},{}'.format(*(self._numstr(n) for n in (x1, y1,
+                                                                      x2, y2,
+                                                                      x3, y3)
+                                            )),
+              end=' ', file=self.file)

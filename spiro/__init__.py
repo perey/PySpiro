@@ -30,6 +30,11 @@ from ._native import (SpiroCPsToBezier, TaggedSpiroCPsToBezier, CPType,
                       spiro_cp)
 from ._context import BezierContext, SVGPathContext
 
+# Private function.
+def _to_cp_array(points):
+    seq = list(spiro_cp(*point) for point in points)
+    return (spiro_cp * len(points))(*seq)
+
 # Public functions.
 def to_bezier(points, closed, context):
     """Convert a sequence of Spiro points to Bézier curves."""
@@ -39,8 +44,3 @@ def to_bezier(points, closed, context):
 def tagged_to_bezier(points, context):
     """Convert a "tagged" sequence of Spiro points to Bézier curves."""
     TaggedSpiroCPsToBezier(_to_cp_array(points), context._native_handle_)
-
-# Private function.
-def _to_cp_array(points):
-    seq = list(spiro_cp(*point) for point in points)
-    return (spiro_cp * len(points))(*seq)
