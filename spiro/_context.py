@@ -24,11 +24,24 @@
 __all__ = ['BezierContext', 'SVGPathContext']
 
 # Standard library imports.
-from ctypes import pointer, c_void_p
+from ctypes import (CFUNCTYPE, POINTER, pointer, Structure, c_double, c_int,
+                    c_void_p)
 
-# Local imports.
-from ._native import (bezctx, moveto_fn, lineto_fn, quadto_fn, curveto_fn,
-                      mark_knot_fn)
+# Native interface definitions.
+class bezctx(Structure):
+    pass
+moveto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double, c_int)
+lineto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double)
+quadto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double, c_double,
+                      c_double)
+curveto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double, c_double,
+                       c_double, c_double, c_double)
+mark_knot_fn = CFUNCTYPE(None, POINTER(bezctx), c_int)
+bezctx._fields_ = [('moveto', moveto_fn),
+                   ('lineto', lineto_fn),
+                   ('quadto', quadto_fn),
+                   ('curveto', curveto_fn),
+                   ('mark_knot', mark_knot_fn)]
 
 class BezierContext:
     """A context in which Bézier curves are generated.
@@ -58,8 +71,9 @@ class BezierContext:
             the given knot index.
 
     The ctx argument to all of these functions is a copy of the instance
-    as seen by the native interface; it can be ignored. Nothing should
-    be returned by these functions.
+    as seen by the native interface; it can be ignored, since the self
+    argument provides exactly the same thing as seen from Python. Nothing
+    should be returned by these functions.
 
     Other operations and information needed by the context will be
     unseen by the native library, and only accessed through these five
@@ -68,6 +82,7 @@ class BezierContext:
     """
     @classmethod
     def from_param(cls, obj):
+        """Adapt this class for native function calls."""
         if isinstance(obj, cls):
             return pointer(bezctx(moveto_fn(obj.moveto),
                                   lineto_fn(obj.lineto),

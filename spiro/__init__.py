@@ -39,8 +39,8 @@ def _to_cp_array(points):
 def to_bezier(points, closed, context):
     """Convert a sequence of Spiro points to Bézier curves."""
     SpiroCPsToBezier(_to_cp_array(points), len(points),
-                     1 if closed else 0, context.from_param(context))
+                     1 if closed else 0, context)
 
 def tagged_to_bezier(points, context):
     """Convert a "tagged" sequence of Spiro points to Bézier curves."""
-    TaggedSpiroCPsToBezier(_to_cp_array(points), context.from_param(context))
+    TaggedSpiroCPsToBezier(_to_cp_array(points), context)

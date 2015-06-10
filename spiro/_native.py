@@ -28,7 +28,7 @@ __all__ = ['spiro_cp', 'CPType', 'bezctx', 'moveto_fn', 'lineto_fn',
 
 # Standard library imports
 import ctypes
-from ctypes import CFUNCTYPE, POINTER, Structure, c_char, c_double, c_int
+from ctypes import POINTER, Structure, c_char, c_double, c_int
 try:
     # Python 3.4+
     from enum import Enum
@@ -39,6 +39,9 @@ except ImportError:
         names, vals = zip(*names_and_vals)
         return namedtuple(typename, names)(*vals)
 import sys
+
+# Local imports.
+from ._context import BezierContext
 
 # Native library import.
 libname = 'libspiro'
@@ -81,22 +84,6 @@ CPType = Enum('SpiroCPType', (('corner',           b'v'),
                               ('end_open_contour', b'}')))
 
 
-class bezctx(Structure):
-    pass
-moveto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double, c_int)
-lineto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double)
-quadto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double, c_double,
-                      c_double)
-curveto_fn = CFUNCTYPE(None, POINTER(bezctx), c_double, c_double, c_double,
-                       c_double, c_double, c_double)
-mark_knot_fn = CFUNCTYPE(None, POINTER(bezctx), c_int)
-bezctx._fields_ = [('moveto', moveto_fn),
-                   ('lineto', lineto_fn),
-                   ('quadto', quadto_fn),
-                   ('curveto', curveto_fn),
-                   ('mark_knot', mark_knot_fn)]
-
-
 # Argument and return types for functions.
 
 # spiro_seg * run_spiro(const spiro_cp *src, int n);
@@ -110,7 +97,7 @@ spiro.free_spiro.restype = None
 free_spiro = spiro.free_spiro
 
 # void spiro_to_bpath(const spiro_seg *s, int n, bezctx *bc);
-spiro.spiro_to_bpath.argtypes = (POINTER(spiro_seg), c_int, POINTER(bezctx))
+spiro.spiro_to_bpath.argtypes = (POINTER(spiro_seg), c_int, BezierContext)
 spiro.spiro_to_bpath.restype = None
 spiro_to_bpath = spiro.spiro_to_bpath
 
@@ -120,12 +107,12 @@ spiro.get_knot_th.restype = c_double
 get_knot_th = spiro.get_knot_th
 
 # void TaggedSpiroCPsToBezier(spiro_cp *spiros, bezctx *bc);
-spiro.TaggedSpiroCPsToBezier.argtypes = (POINTER(spiro_cp), POINTER(bezctx))
+spiro.TaggedSpiroCPsToBezier.argtypes = (POINTER(spiro_cp), BezierContext)
 spiro.TaggedSpiroCPsToBezier.restype = None
 TaggedSpiroCPsToBezier = spiro.TaggedSpiroCPsToBezier
 
 # void SpiroCPsToBezier(spiro_cp *spiros, int n, int isclosed, bezctx *bc);
 spiro.SpiroCPsToBezier.argtypes = (POINTER(spiro_cp), c_int, c_int,
-                                   POINTER(bezctx))
+                                   BezierContext)
 spiro.SpiroCPsToBezier.restype = None
 SpiroCPsToBezier = spiro.SpiroCPsToBezier
