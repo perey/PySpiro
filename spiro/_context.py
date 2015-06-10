@@ -66,13 +66,17 @@ class BezierContext:
     functions.
 
     """
-    @property
-    def _native_handle_(self):
-        return pointer(bezctx(moveto_fn(self.moveto),
-                              lineto_fn(self.lineto),
-                              quadto_fn(self.quadto),
-                              curveto_fn(self.curveto),
-                              mark_knot_fn(self.mark_knot)))
+    @classmethod
+    def from_param(cls, obj):
+        if isinstance(obj, cls):
+            return pointer(bezctx(moveto_fn(obj.moveto),
+                                  lineto_fn(obj.lineto),
+                                  quadto_fn(obj.quadto),
+                                  curveto_fn(obj.curveto),
+                                  mark_knot_fn(obj.mark_knot)))
+        else:
+            raise TypeError('{} cannot adapt anything except its own '
+                            'instances'.format(cls.__name__))
 
     def __init__(self, *args, **kwargs):
         raise NotImplementedError
