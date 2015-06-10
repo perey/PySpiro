@@ -24,13 +24,12 @@
 __all__ = ['spiro_cp', 'CPType', 'TaggedSpiroCPsToBezier', 'SpiroCPsToBezier']
 
 # Standard library imports
-from collections import namedtuple
 import ctypes
-from ctypes import POINTER, Structure, c_char, c_double, c_int
 import sys
 
 # Local imports.
 from ._context import BezierContext
+from ._cp import ControlPoints
 
 # Native library import.
 libname = 'libspiro'
@@ -45,28 +44,15 @@ else:
 
 spiro = libclass(libname + libext)
 
-# Type definitions.
-class spiro_cp(Structure):
-    _fields_ = [('x', c_double),
-                ('y', c_double),
-                ('ty', c_char)]
-
-
-CPType = namedtuple('CPType_tuple',
-                    ('corner', 'g4', 'g2', 'left', 'right', 'end',
-                     'open_contour', 'end_open_contour')
-                    )(b'v', b'o', b'c', b'[', b']', b'z', b'{', b'}')
-
-
 # Argument and return types for functions.
 
 # void TaggedSpiroCPsToBezier(spiro_cp *spiros, bezctx *bc);
-spiro.TaggedSpiroCPsToBezier.argtypes = (POINTER(spiro_cp), BezierContext)
+spiro.TaggedSpiroCPsToBezier.argtypes = (ControlPoints, BezierContext)
 spiro.TaggedSpiroCPsToBezier.restype = None
 TaggedSpiroCPsToBezier = spiro.TaggedSpiroCPsToBezier
 
 # void SpiroCPsToBezier(spiro_cp *spiros, int n, int isclosed, bezctx *bc);
-spiro.SpiroCPsToBezier.argtypes = (POINTER(spiro_cp), c_int, c_int,
-                                   BezierContext)
+spiro.SpiroCPsToBezier.argtypes = (ControlPoints, ctypes.c_int,
+                                   ctypes.c_int, BezierContext)
 spiro.SpiroCPsToBezier.restype = None
 SpiroCPsToBezier = spiro.SpiroCPsToBezier

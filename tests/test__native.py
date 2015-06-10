@@ -22,42 +22,12 @@
 # along with PySpiro. If not, see <http://www.gnu.org/licenses/>.
 
 # Standard library imports.
-import ctypes
 import unittest
 
 # Module to be tested.
 from spiro import _native
 
 # Test cases.
-class TestDataStructures(unittest.TestCase):
-    """Test Python equivalents of libspiro data structures."""
-    def test_CPType_enum(self):
-        """Check the definition of the CPTypes enumeration."""
-        self.assertEqual(len(_native.CPType), 8)
-
-        self.assertEqual(_native.CPType.corner,           b'v')
-        self.assertEqual(_native.CPType.g4,               b'o')
-        self.assertEqual(_native.CPType.g2,               b'c')
-        self.assertEqual(_native.CPType.left,             b'[')
-        self.assertEqual(_native.CPType.right,            b']')
-        self.assertEqual(_native.CPType.end,              b'z')
-        self.assertEqual(_native.CPType.open_contour,     b'{')
-        self.assertEqual(_native.CPType.end_open_contour, b'}')
-
-    def test_spiro_cp_structure(self):
-        """Check the definition of the spiro_cp structure."""
-        self.assertTrue(issubclass(_native.spiro_cp, ctypes.Structure))
-        self.assertEqual(len(_native.spiro_cp._fields_), 3)
-
-        expected_fields = {'x': ctypes.c_double,
-                           'y': ctypes.c_double,
-                           'ty': ctypes.c_char}
-        for fieldname, fieldtype in _native.spiro_cp._fields_:
-            expected_type = expected_fields.get(fieldname)
-            self.assertIsNotNone(expected_type)
-            self.assertIs(fieldtype, expected_type)
-
-
 class TestNativeFunctions(unittest.TestCase):
     """Test ctypes wrappers of native functions."""
     def is__FuncPtr(self, fn):
