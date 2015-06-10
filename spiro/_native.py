@@ -27,17 +27,9 @@ __all__ = ['spiro_cp', 'CPType', 'bezctx', 'moveto_fn', 'lineto_fn',
            'TaggedSpiroCPsToBezier', 'SpiroCPsToBezier']
 
 # Standard library imports
+from collections import namedtuple
 import ctypes
 from ctypes import POINTER, Structure, c_char, c_double, c_int
-try:
-    # Python 3.4+
-    from enum import Enum
-except ImportError:
-    # Python pre-3.4
-    from collections import namedtuple
-    def Enum(typename, names_and_vals):
-        names, vals = zip(*names_and_vals)
-        return namedtuple(typename, names)(*vals)
 import sys
 
 # Local imports.
@@ -74,14 +66,10 @@ class spiro_seg(Structure):
                 ('l', c_double)]
 
 
-CPType = Enum('SpiroCPType', (('corner',           b'v'),
-                              ('g4',               b'o'),
-                              ('g2',               b'c'),
-                              ('left',             b'['),
-                              ('right',            b']'),
-                              ('end',              b'z'),
-                              ('open_contour',     b'{'),
-                              ('end_open_contour', b'}')))
+CPType = namedtuple('CPType_tuple',
+                    ('corner', 'g4', 'g2', 'left', 'right', 'end',
+                     'open_contour', 'end_open_contour')
+                    )(b'v', b'o', b'c', b'[', b']', b'z', b'{', b'}')
 
 
 # Argument and return types for functions.
