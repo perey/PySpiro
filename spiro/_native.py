@@ -21,10 +21,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PySpiro. If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['spiro_cp', 'CPType', 'bezctx', 'moveto_fn', 'lineto_fn',
-           'quadto_fn', 'curveto_fn', 'mark_knot_fn',
-           'run_spiro', 'free_spiro', 'spiro_to_bpath', 'get_knot_th',
-           'TaggedSpiroCPsToBezier', 'SpiroCPsToBezier']
+__all__ = ['spiro_cp', 'CPType', 'TaggedSpiroCPsToBezier', 'SpiroCPsToBezier']
 
 # Standard library imports
 from collections import namedtuple
@@ -44,7 +41,7 @@ elif sys.platform == 'darwin':
 elif sys.platform == 'win32':
     libclass, libext = ctypes.WinDLL, '.dll'
 else:
-    raise ImportError('Spiro does not support {!r}'.format(sys.platform))
+    raise ImportError('spiro does not support {!r}'.format(sys.platform))
 
 spiro = libclass(libname + libext)
 
@@ -55,17 +52,6 @@ class spiro_cp(Structure):
                 ('ty', c_char)]
 
 
-class spiro_seg(Structure):
-    _fields_ = [('x', c_double),
-                ('y', c_double),
-                ('ty', c_char),
-                ('bend_th', c_double),
-                ('ks', c_double * 4),
-                ('seg_ch', c_double),
-                ('seg_th', c_double),
-                ('l', c_double)]
-
-
 CPType = namedtuple('CPType_tuple',
                     ('corner', 'g4', 'g2', 'left', 'right', 'end',
                      'open_contour', 'end_open_contour')
@@ -73,26 +59,6 @@ CPType = namedtuple('CPType_tuple',
 
 
 # Argument and return types for functions.
-
-# spiro_seg * run_spiro(const spiro_cp *src, int n);
-spiro.run_spiro.argtypes = (POINTER(spiro_cp), c_int)
-spiro.run_spiro.restype = POINTER(spiro_cp)
-run_spiro = spiro.run_spiro
-
-# void free_spiro(spiro_seg *s);
-spiro.free_spiro.argtypes = (POINTER(spiro_seg),)
-spiro.free_spiro.restype = None
-free_spiro = spiro.free_spiro
-
-# void spiro_to_bpath(const spiro_seg *s, int n, bezctx *bc);
-spiro.spiro_to_bpath.argtypes = (POINTER(spiro_seg), c_int, BezierContext)
-spiro.spiro_to_bpath.restype = None
-spiro_to_bpath = spiro.spiro_to_bpath
-
-# double get_knot_th(const spiro_seg *s, int i);
-spiro.get_knot_th.argtypes = (POINTER(spiro_seg), c_int)
-spiro.get_knot_th.restype = c_double
-get_knot_th = spiro.get_knot_th
 
 # void TaggedSpiroCPsToBezier(spiro_cp *spiros, bezctx *bc);
 spiro.TaggedSpiroCPsToBezier.argtypes = (POINTER(spiro_cp), BezierContext)

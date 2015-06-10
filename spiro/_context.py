@@ -43,6 +43,7 @@ bezctx._fields_ = [('moveto', moveto_fn),
                    ('curveto', curveto_fn),
                    ('mark_knot', mark_knot_fn)]
 
+# The base context class, and examples.
 class BezierContext:
     """A context in which Bézier curves are generated.
 
