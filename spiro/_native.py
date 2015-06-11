@@ -33,12 +33,13 @@ from ._cp import ControlPoints
 
 # Native library import.
 libname = 'libspiro'
+libver = '0'
 if sys.platform.startswith('linux'):
-    libclass, libext = ctypes.CDLL, '.so'
+    libclass, libext = ctypes.CDLL, '.so.{}'.format(libver)
 elif sys.platform == 'darwin':
     libclass, libext = ctypes.CDLL, '.dylib'
 elif sys.platform == 'win32':
-    libclass, libext = ctypes.WinDLL, '.dll'
+    libclass, libext = ctypes.CDLL, '-{}.dll'.format(libver)
 else:
     raise ImportError('spiro does not support {!r}'.format(sys.platform))
 
