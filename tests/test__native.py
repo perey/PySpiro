@@ -22,6 +22,12 @@
 # along with PySpiro. If not, see <http://www.gnu.org/licenses/>.
 
 # Standard library imports.
+try:
+    # Python 3.3+
+    from collections.abc import Callable
+except ImportError:
+    # Python pre-3.3
+    from collections import Callable
 import unittest
 
 # Module to be tested.
@@ -30,22 +36,23 @@ from spiro import _native
 # Test cases.
 class TestNativeFunctions(unittest.TestCase):
     """Test ctypes wrappers of native functions."""
-    def is__FuncPtr(self, fn):
+    def assertIs_FuncPtr(self, fn):
         """Test whether a function is an instance of ctypes._FuncPtr."""
         # Callable foreign functions are instances of the private ctypes class
         # '_FuncPtr', so we settle for checking its repr() instead.
-        return repr(fn).startswith('<_FuncPtr object at ')
+        self.assertTrue(repr(fn).startswith('<_FuncPtr object at '),
+                        msg="{!r} is not of type '_FuncPtr'".format(fn))
         
     def test_SpiroCPsToBezier_wrapper(self):
         """Test the wrapper of the SpiroCPsToBezier() function."""
-        self.assertTrue(self.is__FuncPtr(_native.SpiroCPsToBezier))
-        self.assertTrue(callable(_native.SpiroCPsToBezier))
+        self.assertIs_FuncPtr(_native.SpiroCPsToBezier)
+        self.assertIsInstance(_native.SpiroCPsToBezier, Callable)
         self.assertEqual(len(_native.SpiroCPsToBezier.argtypes), 4)
         self.assertIsNone(_native.SpiroCPsToBezier.restype)
 
     def test_TaggedSpiroCPsToBezier_wrapper(self):
         """Test the wrapper of the SpiroCPsToBezier() function."""
-        self.assertTrue(self.is__FuncPtr(_native.TaggedSpiroCPsToBezier))
-        self.assertTrue(callable(_native.TaggedSpiroCPsToBezier))
+        self.assertIs_FuncPtr(_native.TaggedSpiroCPsToBezier)
+        self.assertIsInstance(_native.TaggedSpiroCPsToBezier, Callable)
         self.assertEqual(len(_native.TaggedSpiroCPsToBezier.argtypes), 2)
         self.assertIsNone(_native.TaggedSpiroCPsToBezier.restype)
