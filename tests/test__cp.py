@@ -29,6 +29,7 @@ except ImportError:
     # Python pre-3.3
     from collections import MutableSequence
 import ctypes
+import operator
 import unittest
 
 # Module to be tested.
@@ -78,10 +79,40 @@ class TestControlPointsInstantiation(unittest.TestCase):
         self.assertIsInstance(cps, _cp.ControlPoints)
         self.assertEqual(len(cps), 2)
 
+
 class TestControlPointsSequence(unittest.TestCase):
-    """Test whether ControlPoints implements the sequence interface."""
+    """Test whether ControlPoints implements the sequence interface.
+
+    As ControlPoints derives from the MutableSequence ABC (tested in the
+    TestControlPointsInstantiation test case), the mixin methods that
+    the ABC provides are not tested. Only the five methods (__getitem__,
+    __setitem__, __delitem__, __len__, and insert) that the ABC leaves
+    abstract are tested.
+
+    """
     def setUp(self):
         self.cps = _cp.ControlPoints()
 
+    def test_getitem(self):
+        # Sequence types raise IndexError, others raise TypeError.
+        self.assertRaises(IndexError, operator.getitem, self.cps, 0)
+
+    def test_setitem(self):
+        # Mutable sequence types raise IndexError, others raise TypeError.
+        self.assertRaises(IndexError, operator.setitem, self.cps, 0, None)
+
+    def test_delitem(self):
+        # Mutable sequence types raise IndexError, others raise TypeError.
+        self.assertRaises(IndexError, operator.delitem, self.cps, 0)
+
     def test_has_length(self):
         self.assertEqual(len(self.cps), 0)
+
+    def test_insert(self):
+        self.cps.insert(0, (1, 2, b'o'))
+        self.assertEqual(len(self.cps), 1)
+
+    def test_insert_wrong(self):
+        self.assertRaises(TypeError, self.cps.insert(0, (1, 2)))
+        self.assertRaises(TypeError, self.cps.insert(0, [1, 2, b'o']))
+        self.assertRaises(TypeError, self.cps.insert(0, (1, 2, 'o')))
