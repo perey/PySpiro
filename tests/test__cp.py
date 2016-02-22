@@ -99,7 +99,8 @@ class TestControlPointsSequence(unittest.TestCase):
 
     def test_setitem(self):
         # Mutable sequence types raise IndexError, others raise TypeError.
-        self.assertRaises(IndexError, operator.setitem, self.cps, 0, None)
+        self.assertRaises(IndexError, operator.setitem, self.cps, 0,
+                          (1, 2, b'o'))
 
     def test_delitem(self):
         # Mutable sequence types raise IndexError, others raise TypeError.
