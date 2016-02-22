@@ -29,7 +29,6 @@ except ImportError:
     # Python pre-3.3
     from collections import MutableSequence
 import ctypes
-import operator
 import unittest
 
 # Module to be tested.
@@ -95,16 +94,18 @@ class TestControlPointsSequence(unittest.TestCase):
 
     def test_getitem(self):
         # Sequence types raise IndexError, others raise TypeError.
-        self.assertRaises(IndexError, operator.getitem, self.cps, 0)
+        with self.assertRaises(IndexError):
+            self.cps[0]
 
     def test_setitem(self):
         # Mutable sequence types raise IndexError, others raise TypeError.
-        self.assertRaises(IndexError, operator.setitem, self.cps, 0,
-                          (1, 2, b'o'))
+        with self.assertRaises(IndexError):
+            self.cps[0] = (1, 2, b'o')
 
     def test_delitem(self):
         # Mutable sequence types raise IndexError, others raise TypeError.
-        self.assertRaises(IndexError, operator.delitem, self.cps, 0)
+        with self.assertRaises(IndexError):
+            del self.cps[0]
 
     def test_has_length(self):
         self.assertEqual(len(self.cps), 0)
@@ -113,7 +114,29 @@ class TestControlPointsSequence(unittest.TestCase):
         self.cps.insert(0, (1, 2, b'o'))
         self.assertEqual(len(self.cps), 1)
 
+    def test_setitem_wrong(self):
+        self.cps.insert(0, (1, 2, b'o'))
+        with self.assertRaisesRegex(TypeError, 'object is not iterable'):
+            self.cps[0] = 0
+        with self.assertRaisesRegex(ValueError, 'not enough values to unpack'):
+            self.cps[0] = (1, 2)
+        with self.assertRaisesRegex(ValueError, 'unknown control point type'):
+            self.cps[0] = (1, 2, 'o')
+        with self.assertRaisesRegex(TypeError,
+                                    'coordinates must be real numeric'):
+            self.cps[0] = ('one', 2, b'o')
+        with self.assertRaisesRegex(TypeError,
+                                    'coordinates must be real numeric'):
+            self.cps[0] = (1, 2j, b'o')
+
     def test_insert_wrong(self):
-        self.assertRaises(TypeError, self.cps.insert(0, (1, 2)))
-        self.assertRaises(TypeError, self.cps.insert(0, [1, 2, b'o']))
-        self.assertRaises(TypeError, self.cps.insert(0, (1, 2, 'o')))
+        self.assertRaisesRegex(TypeError, 'object is not iterable',
+                               self.cps.insert, 0, 0)
+        self.assertRaisesRegex(ValueError, 'not enough values to unpack',
+                               self.cps.insert, 0, (1, 2))
+        self.assertRaisesRegex(ValueError, 'unknown control point type',
+                               self.cps.insert, 0, (1, 2, 'o'))
+        self.assertRaisesRegex(TypeError, 'coordinates must be real numeric',
+                               self.cps.insert, 0, ('one', 2, b'o'))
+        self.assertRaisesRegex(TypeError, 'coordinates must be real numeric',
+                               self.cps.insert, 0, (1, 2j, b'o'))

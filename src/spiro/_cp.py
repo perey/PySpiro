@@ -32,6 +32,7 @@ except ImportError:
     # Python pre-3.3
     from collections import MutableSequence, Sequence
 from ctypes import pointer, Structure, c_double, c_char
+from numbers import Real
 
 # Native interface definitions.
 class spiro_cp(Structure):
@@ -64,6 +65,16 @@ class ControlPoints(MutableSequence):
             raise TypeError('{} can only adapt sequence types, not '
                             '{!r}'.format(cls.__name__, type(obj).__name__))
 
+    @staticmethod
+    def _checkval(val):
+        # Unpack the value, raising a TypeError if it is not iterable, and a
+        # ValueError if it is the wrong length.
+        x, y, cptype = val
+        if not all(isinstance(coord, Real) for coord in (x, y)):
+            raise TypeError('coordinates must be real numeric')
+        if cptype not in CPType:
+            raise ValueError('unknown control point type: {!r}'.format(cptype))
+
     def __init__(self, seq=None):
         self._seq = [] if seq is None else list(seq)
 
@@ -71,10 +82,7 @@ class ControlPoints(MutableSequence):
         return self._seq[index]
 
     def __setitem__(self, index, val):
-        x, y, cptype = val
-        if cptype not in CPType:
-            raise ValueError('unknown control point type: {!r}'.format(cptype))
-        self._seq[index] = [x, y, cptype]
+        self._seq[index] = self._checkval(val)
 
     def __delitem__(self, index):
         del self._seq[index]
@@ -83,4 +91,4 @@ class ControlPoints(MutableSequence):
         return len(self._seq)
 
     def insert(self, index, val):
-        self._seq.insert(index, val)
+        self._seq.insert(index, self._checkval(val))
