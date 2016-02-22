@@ -2,7 +2,7 @@
 
 """Unit tests for the PySpiro _context module."""
 
-# Copyright © 2015 Timothy Pederick.
+# Copyright © 2015, 2016 Timothy Pederick.
 # Based on libspiro:
 #     Copyright © 2007 Raph Levien
 #

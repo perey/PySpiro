@@ -7,8 +7,8 @@ curve design tool.
 
 Licence
 =======
-PySpiro is copyright © 2015 Timothy Pederick. It is based on libspiro, which is
-copyright © 2007 Raph Levien.
+PySpiro is copyright © 2015, 2016 Timothy Pederick. It is based on libspiro,
+which is copyright © 2007 Raph Levien.
 
 PySpiro is free software: you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
