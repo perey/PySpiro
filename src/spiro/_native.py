@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PySpiro. If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['spiro_cp', 'CPType', 'TaggedSpiroCPsToBezier', 'SpiroCPsToBezier']
+__all__ = ['TaggedSpiroCPsToBezier', 'SpiroCPsToBezier']
 
 # Standard library imports
 import ctypes
